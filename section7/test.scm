@@ -1,3 +1,5 @@
+(use util.match)
+
 (define (tree-walk walker proc tree)
     (walker (lambda (elt)
                 (if (list? elt)
@@ -44,3 +46,50 @@
                           [(> n 0) (even? (- n 1))]
                           [else (even? (+ n 1))]))))
     (even? 1280))
+
+(define (mit-form->primitive-form expr)
+    (cons (car expr)
+       (cons (car (car (cdr expr)))
+          (list (cons 'lambda
+             (cons (cdr (car (cdr expr)))
+                 (cdr (cdr expr))))))))
+
+(define (primitive-form->mit-form expr)
+    (cons (car expr)
+        (cons (cons (car (cdr expr)) (car (cdr (car (cdr (cdr expr))))))
+            (cdr (cdr (car (cdr (cdr expr))))))))
+
+(define (append/log . args)
+    (print "args=" args)
+    (apply append args))
+
+(define (make-logger func)
+    (lambda args
+        (print "args=" args)
+        (apply func args)))
+
+(define (append2 lis1 lis2)
+    (if (pair? lis1)
+        (cons (car lis1) (append2 (cdr lis1) lis2))
+        lis2))
+
+(define (append22 lis1 lis2)
+    (define (append22-sub lisa lisb)
+        (if (null? lisa)
+            lisb
+            (append22-sub (cdr lisa) (cons (car lisa) lisb))))
+    (append22-sub (reverse lis1) lis2))
+
+(define (append222 lis1 lis2)
+    (fold cons lis2 (reverse lis1)))
+
+(define (append . args)
+    (cond [(null? args) '()]
+          [(null? (cdr args)) (car args)]
+          [else (append2 (car args) (apply append (cdr args)))]))
+
+(define (append-match . args)
+    (match args
+        [() '()]
+        [(a) a ]
+        [(a . b) (append2 a (apply append b))]))
