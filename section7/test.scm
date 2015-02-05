@@ -93,3 +93,31 @@
         [() '()]
         [(a) a ]
         [(a . b) (append2 a (apply append b))]))
+
+(define (make-list num . args)
+    (define (maker n init)
+        (if (= n 0)
+            '()
+            (cons init (maker (- n 1) init))))
+    (maker num (if (null? args) #f (car args))))
+
+(define (make-list2 num . args)
+    (let-optionals* args ((init #f))
+        (define (maker n)
+            (if (= n 0)
+                '()
+                (cons init (maker (- n 1)))))
+        (maker num)))
+
+(define (person . args)
+    (let-keywords args ((name "Anonymous")
+                        (age  "unknown"))
+        (print name " is " age " year(s) old.")))
+
+(define (person2 . args)
+    (let-keywords args ((name "Anonymous")
+                        (age  "unknown")
+                        . other-args)
+        (print name " is " age " year(s) old.")
+        (print "Other info: " other-args)))
+
